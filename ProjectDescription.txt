@@ -1,0 +1,15 @@
+Dart naming conventions:
+Element 	Schreibweise	  Beispiel
+Datei	    snake_case	    settings_page.dart
+Klasse	  PascalCase	    SettingsPage
+Methode	  lowerCamelCase	loadSettings()
+Parameter	lowerCamelCase	newValue
+Variable	lowerCamelCase	userName
+Enum	    PascalCase	    UserRole
+Konstante lowerCamelCase  maxRetries = 3;
+    oder  Caps_with_Unde. MAX_RETRIES = 3;
+All private elements starting with'_':  _lowerCamelCase _onChanged()
+
+
+Version 1.0.0
+copy code from teachers_timetable
