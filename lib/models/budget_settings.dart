@@ -31,4 +31,33 @@ class BudgetSettings {
     suggestionsFilename = block.suggestionsFilename;
   }
   
+  // jsonEncode() akzeptiert nur: 
+  //    primitive Typen (String, int, double, bool)
+  //    Listen, Maps und Objekte, die eine toJson()‑Methode besitzen
+  // Optional: Automatische JSON‑Generierung (json_serializable)
+
+  // JSON-Export
+  Map<String, dynamic> toJson() => {
+        'titleLine': titleLine,
+        'hideLeftList': hideLeftList,
+        'hideRightList': hideRightList,
+        'showOpenOnly': showOpenOnly,
+        'defaultBudget': defaultBudget,
+        'workplanFilename': workplanFilename,
+        'suggestionsFilename': suggestionsFilename,
+      };
+
+  // JSON-Import
+  factory BudgetSettings.fromJson(Map<String, dynamic> json) {
+    return BudgetSettings(
+      titleLine: json['titleLine'] ?? 'Budget Info',
+      hideLeftList: json['hideLeftList'] ?? false,
+      hideRightList: json['hideRightList'] ?? true,
+      showOpenOnly: json['showOpenOnly'] ?? false,
+      defaultBudget: (json['defaultBudget'] ?? 100).toDouble(),
+      workplanFilename: json['workplanFilename'] ?? '',
+      suggestionsFilename: json['suggestionsFilename'] ?? '',
+    );
+  }
+
 }

@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// No description provided for @editTitle.
   ///
   /// In en, this message translates to:
-  /// **'Edit Title'**
+  /// **'App title'**
   String get editTitle;
 
   /// No description provided for @printPdf.
@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @editBudget.
   ///
   /// In en, this message translates to:
-  /// **'Edit Budget'**
+  /// **'Start budget for new entries'**
   String get editBudget;
 
   /// No description provided for @editBudgetHint.
@@ -185,7 +185,7 @@ abstract class AppLocalizations {
   /// No description provided for @editSuggestionsFilename.
   ///
   /// In en, this message translates to:
-  /// **'Templates filename'**
+  /// **'Template list filename'**
   String get editSuggestionsFilename;
 
   /// No description provided for @workplanFilename.
@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   /// No description provided for @suggestionsFilename.
   ///
   /// In en, this message translates to:
-  /// **'Templates filename'**
+  /// **'Template list filename'**
   String get suggestionsFilename;
 
   /// No description provided for @showOpenOnly.

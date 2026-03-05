@@ -21,16 +21,18 @@ class _EditSettingsDialogState extends State<EditSettingsDialog> {
   late TextEditingController leftListFilenameController;
   late TextEditingController rightListFilenameController;
   late bool showOpenOnly;
+  BudgetSettings internalSettings = new BudgetSettings();
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    titleLineController = TextEditingController(text: widget.settings.titleLine.length == 0 ? 'Budget Info' : widget.settings.titleLine);
-    budgetController = TextEditingController(text: widget.settings.defaultBudget.toString());
-    showOpenOnly = widget.settings.showOpenOnly;
-    leftListFilenameController = TextEditingController(text: widget.settings.workplanFilename.length == 0 ? FilenameHelper.getDefaultLeftFilename(false) : widget.settings.workplanFilename);
-    rightListFilenameController = TextEditingController(text: widget.settings.suggestionsFilename.length == 0 ? FilenameHelper.getDefaultRightFilename(false) : widget.settings.suggestionsFilename);
+    internalSettings.copy(widget.settings);
+    titleLineController = TextEditingController(text: internalSettings.titleLine);
+    budgetController = TextEditingController(text: internalSettings.defaultBudget.toStringAsFixed(2));
+    showOpenOnly = internalSettings.showOpenOnly;
+    leftListFilenameController = TextEditingController(text: internalSettings.workplanFilename.length == 0 ? FilenameHelper.getDefaultLeftFilename(false) : internalSettings.workplanFilename);
+    rightListFilenameController = TextEditingController(text: internalSettings.suggestionsFilename.length == 0 ? FilenameHelper.getDefaultRightFilename(false) : internalSettings.suggestionsFilename);
     titleLineController.addListener(() { _onSettingChanged(); });
     budgetController.addListener(() { _onSettingChanged(); });
     leftListFilenameController.addListener(() { _onSettingChanged(); });
@@ -47,47 +49,54 @@ class _EditSettingsDialogState extends State<EditSettingsDialog> {
     super.dispose();
   }
 
+  void _showError(String message) {
+    if (context.mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red, duration: const Duration(seconds: 2)));}
+  }
+
   void _onSettingChanged() { 
     if (_debounce?.isActive ?? false) _debounce!.cancel(); 
     _debounce = Timer(const Duration(milliseconds: 900), () { 
       // this happens after the timer elapsed
       // e.g. validiate, store, setState, and so on })
       _debounce!.cancel();
-      bool changed = false;
       
-      if(widget.settings.titleLine != titleLineController.text) { changed = true; widget.settings.titleLine = titleLineController.text; }
-      
-      if(widget.settings.defaultBudget != budgetController.text) { changed = true; widget.settings.defaultBudget = double.parse(budgetController.text); }
-      
-      if(widget.settings.workplanFilename != leftListFilenameController.text) { 
-        if( FilenameHelper.getDefaultLeftFilename(false) == leftListFilenameController.text) {
-          if(widget.settings.workplanFilename.length != 0) { changed = true; widget.settings.workplanFilename = ''; }
-          } else { 
-          changed = true; widget.settings.workplanFilename = leftListFilenameController.text; 
-        }
+      internalSettings.titleLine = titleLineController.text;
+      final parsed = double.tryParse(budgetController.text.replaceAll(",", "."));
+      if (parsed == null) { 
+        _showError(AppLocalizations.of(context)!.noValidNumber);
       }
-      
-      if(widget.settings.suggestionsFilename != rightListFilenameController.text) { 
-        if( FilenameHelper.getDefaultRightFilename(false) == rightListFilenameController.text) {
-          if(widget.settings.suggestionsFilename.length != 0) { changed = true; widget.settings.suggestionsFilename = ''; }
-          } else { 
-          changed = true; widget.settings.suggestionsFilename = rightListFilenameController.text; 
-        }
+      else {
+        internalSettings.defaultBudget = double.parse(budgetController.text.replaceAll(",", "."));
       }
-      
-      if(changed) {
-        setState(() {});
-        widget.onSave(widget.settings);
+
+      if( FilenameHelper.getDefaultLeftFilename(false) == leftListFilenameController.text) {
+        if(internalSettings.workplanFilename.length > 0) { internalSettings.workplanFilename = ''; }
+      } else { 
+        internalSettings.workplanFilename = leftListFilenameController.text; 
+      }
+
+      if( FilenameHelper.getDefaultRightFilename(false) == rightListFilenameController.text) {
+        if(internalSettings.suggestionsFilename.length > 0) { internalSettings.suggestionsFilename = ''; }
+        } else { 
+          internalSettings.suggestionsFilename = rightListFilenameController.text; 
+      }
+
+      if(widget.settings.titleLine != internalSettings.titleLine ||
+         widget.settings.defaultBudget != internalSettings.defaultBudget || 
+         widget.settings.workplanFilename != internalSettings.workplanFilename ||
+         widget.settings.suggestionsFilename != internalSettings.suggestionsFilename) {
+          setState(() {});
+          widget.onSave(internalSettings);
       }
     });
   }
 
   void _onSettingChangedDirectly() { 
     bool changed = false;
-    if(widget.settings.showOpenOnly != showOpenOnly) { changed = true; widget.settings.showOpenOnly = showOpenOnly; }
+    if(widget.settings.showOpenOnly != showOpenOnly) { changed = true; internalSettings.showOpenOnly = showOpenOnly; }
     if(changed) {
       setState(() {});
-      widget.onSave(widget.settings);
+      widget.onSave(internalSettings);
     }
   }
 

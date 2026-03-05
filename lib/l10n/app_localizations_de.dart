@@ -18,7 +18,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get help => 'Hilfe';
 
   @override
-  String get editTitle => 'Titel bearbeiten';
+  String get editTitle => 'App Titel';
 
   @override
   String get printPdf => 'Liste Drucken';
@@ -46,7 +46,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get time => 'Zeit';
 
   @override
-  String get editBudget => 'Budget bearbeiten';
+  String get editBudget => 'Start Budget für neue Einträge';
 
   @override
   String get editBudgetHint =>
@@ -62,7 +62,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get workplanFilename => 'Dateiname der Liste';
 
   @override
-  String get suggestionsFilename => 'Dateiname der Templates';
+  String get suggestionsFilename => 'Dateiname der Template Liste';
 
   @override
   String get showOpenOnly => 'Verstecke abgeschlossene Kopfzeilen';

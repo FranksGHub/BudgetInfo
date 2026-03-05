@@ -21,9 +21,8 @@ class BudgetInfoPage extends StatefulWidget {
 }
 
 class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObserver {
-  String title = 'Lehrer Stundenplan';
-  late BudgetSettings budgetSettings;
-  late String dataPath;
+  BudgetSettings budgetSettings = new BudgetSettings();
+  String dataPath = '';
 
   List<BlockItem> leftItems = <BlockItem>[];
   List<BlockItem> rightItems = <BlockItem>[];
@@ -34,7 +33,6 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
   int? selectedRightSubIndex;
   bool isLoading = false;
   bool isPreview = false;
-  bool listDataLoaded = false;
 
   @override
   void initState() {
@@ -59,10 +57,12 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
     try {
       // get or create data path
       dataPath = await ExportImportFiles.getPrivateDirectoryPath();
+
       String settingsPath = p.join(dataPath, FilenameHelper.getSettingsFilename());
+
       if (File(settingsPath).existsSync()) {
         String json = File(settingsPath).readAsStringSync();
-        budgetSettings = jsonDecode(json);
+        budgetSettings = BudgetSettings.fromJson(jsonDecode(json));
       }
       else {  // load the defaulte
         budgetSettings = new BudgetSettings();
@@ -78,7 +78,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
   void _saveSettings() {
     try {
       String settingsPath = p.join(dataPath, FilenameHelper.getSettingsFilename());
-      String json = jsonEncode(budgetSettings);
+      String json = jsonEncode(budgetSettings.toJson());
       File(settingsPath).writeAsStringSync(json);
     } catch (e) {
       _showError(AppLocalizations.of(context)!.failedToSaveSettingsData + ': $e');
@@ -134,7 +134,6 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
       _emptyList(false, true);
     }
 
-    listDataLoaded = true;
     setState(() {});
   }
 
@@ -212,13 +211,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
 
   void _switchListVisibility(bool leftList) {
     setState(() {
-      if (leftList) {
-        budgetSettings.hideLeftList = !budgetSettings.hideLeftList;
-        if (!budgetSettings.hideLeftList && !listDataLoaded) { _loadWorkplanData(); }
-      } else {
-        budgetSettings.hideRightList = !budgetSettings.hideRightList;
-        if (!budgetSettings.hideRightList && !listDataLoaded) { _loadWorkplanData(); }
-      }
+      if (leftList) { budgetSettings.hideLeftList = !budgetSettings.hideLeftList; } 
+      else { budgetSettings.hideRightList = !budgetSettings.hideRightList; }
     });
     _saveSettings();
   }
@@ -256,15 +250,16 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
   }
 
   void _saveNewSettings(updatedBlock){
-    if(budgetSettings.titleLine != updatedBlock.titleLine) { budgetSettings.titleLine = updatedBlock.workplanFilename; }
-    if(budgetSettings.defaultBudget != updatedBlock.defaultBudget) { budgetSettings.defaultBudget = updatedBlock.defaultBudget; }
-    if(budgetSettings.showOpenOnly != updatedBlock.showOpenOnly) { budgetSettings.showOpenOnly = updatedBlock.showOpenOnly; }
-    if(budgetSettings.workplanFilename != updatedBlock.workplanFilename) { budgetSettings.workplanFilename = updatedBlock.workplanFilename; }
-    if(budgetSettings.suggestionsFilename != updatedBlock.suggestionsFilename) { budgetSettings.suggestionsFilename = updatedBlock.suggestionsFilename; }
-    if(budgetSettings.defaultBudget != updatedBlock.defaultBudget) { budgetSettings.defaultBudget = updatedBlock.defaultBudget; }
-    
-    setState(() {});
-    _saveSettings();
+    bool changed = false;
+    if(budgetSettings.titleLine != updatedBlock.titleLine) { changed = true; budgetSettings.titleLine = updatedBlock.titleLine; }
+    if(budgetSettings.defaultBudget != updatedBlock.defaultBudget) { changed = true; budgetSettings.defaultBudget = updatedBlock.defaultBudget; }
+    if(budgetSettings.showOpenOnly != updatedBlock.showOpenOnly) { changed = true; budgetSettings.showOpenOnly = updatedBlock.showOpenOnly; }
+    if(budgetSettings.workplanFilename != updatedBlock.workplanFilename) { changed = true; budgetSettings.workplanFilename = updatedBlock.workplanFilename; }
+    if(budgetSettings.suggestionsFilename != updatedBlock.suggestionsFilename) { changed = true; budgetSettings.suggestionsFilename = updatedBlock.suggestionsFilename; }
+    if(changed) {
+      setState(() {});
+      _saveSettings();
+    }
   }
 
 
@@ -388,7 +383,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     onPressed: () {
                       final newItemText = AppLocalizations.of(context)!.newItem;
                       setState(() {
-                        leftItems.add(BlockItem(text: newItemText));
+                        leftItems.add(BlockItem(text: newItemText, startBudget: 0));
                         leftExpanded.add(true);
                       });
                       _saveLeftData();
@@ -400,7 +395,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     onPressed: selectedLeftIndex != null ? () {
                       final newSubitemText = AppLocalizations.of(context)!.newSubitem;
                       setState(() {
-                        leftItems[selectedLeftIndex!].subitems.add(BlockItem(text: newSubitemText));
+                        leftItems[selectedLeftIndex!].subitems.add(BlockItem(text: newSubitemText, startBudget: budgetSettings.defaultBudget, resultBudget: budgetSettings.defaultBudget));
                       });
                       _saveLeftData();
                     } : null,
@@ -414,7 +409,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                   ElevatedButton(
                     onPressed: selectedRightIndex != null ? () {
                       var item = rightItems[selectedRightIndex!];
-                      var newItem = BlockItem(text: item.text, subitems: item.subitems.map((s) => BlockItem(text: s.text)).toList(), status: '(P)');
+                      var newItem = BlockItem(text: item.text, startBudget: 0, subitems: item.subitems.map((s) => BlockItem(text: s.text, startBudget: budgetSettings.defaultBudget)).toList(), status: '(P)');
                       setState(() {
                         leftItems.add(newItem);
                         leftExpanded.add(true);
@@ -428,7 +423,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     onPressed: selectedRightIndex != null && selectedRightSubIndex != null && selectedLeftIndex != null ? () {
                       final sub = rightItems[selectedRightIndex!].subitems[selectedRightSubIndex!];
                         setState(() {
-                          leftItems[selectedLeftIndex!].subitems.add(BlockItem(text: sub.text));
+                          leftItems[selectedLeftIndex!].subitems.add(BlockItem(text: sub.text, startBudget: budgetSettings.defaultBudget, resultBudget: budgetSettings.defaultBudget));
                         });
                         _saveLeftData();
                       } : null,
@@ -443,7 +438,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     onPressed: () {
                       final newItemText = AppLocalizations.of(context)!.newItem;
                       setState(() {
-                        rightItems.add(BlockItem(text: newItemText));
+                        rightItems.add(BlockItem(text: newItemText, startBudget: 0));
                         rightExpanded.add(true);
                       });
                       _saveRightData();
@@ -455,7 +450,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     onPressed: selectedRightIndex != null ? () {
                       final newSubitemText = AppLocalizations.of(context)!.newSubitem;
                       setState(() {
-                        rightItems[selectedRightIndex!].subitems.add(BlockItem(text: newSubitemText));
+                        rightItems[selectedRightIndex!].subitems.add(BlockItem(text: newSubitemText, startBudget: 0));
                       });
                       _saveRightData();
                     } : null,
@@ -472,8 +467,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                   Expanded(
                     child: Column(
                       children: [
-                        Text(' ', style: const TextStyle(fontSize: 12)),
-                        Text(AppLocalizations.of(context)!.leftList, style: const TextStyle(height: 1.5, fontSize: 20, fontWeight: FontWeight.bold)),
+                        //Text(' ', style: const TextStyle(fontSize: 12)),
+                        //Text(AppLocalizations.of(context)!.leftList, style: const TextStyle(height: 1.5, fontSize: 20, fontWeight: FontWeight.bold)),
                         Expanded(
                           child: ListView.builder(
                             itemCount: leftItems.length,
@@ -490,8 +485,6 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                   onTap: () {
                                     setState(() {
                                       selectedLeftIndex = index;
-                                      // selectedRightIndex = null;
-                                      // selectedRightSubIndex = null;
                                     });
                                   },
                                   onDoubleTap: () => _editText(item.text, (newText) {
@@ -557,20 +550,12 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                         constraints: const BoxConstraints(minWidth: 24, minHeight: 24),  // reduziert die Mindestgröße
                                         splashRadius: 48,
                                         onPressed: () {
-                                          setState(() {
-                                            if (sub.status == '(P)') {
-                                              sub.status = '(W)';
-                                            } else if (sub.status == '(W)') {
-                                              sub.status = '(F)';
-                                            } else {
-                                              sub.status = '(P)';
-                                            }
-                                          });
+                                          setState(() { sub.changeStatus(); });
                                           _saveLeftData();
                                         },
                                       ),
                                       
-                                      Text(sub.status ?? '(P)', style: const TextStyle(height: 1.0, fontSize: 14)),
+                                      //Text(sub.status ?? '(P)', style: const TextStyle(height: 1.0, fontSize: 14)),
                                       const SizedBox(width: 8, height: 8),
                                       Expanded(
                                         child: GestureDetector(
@@ -578,7 +563,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                             setState(() => sub.text = newText);
                                             _saveLeftData();
                                           }),
-                                          child: Text(sub.text, style: const TextStyle(height: 1.0, fontSize: 16)),
+                                          child: Text(sub.getText(), style: const TextStyle(height: 1.0, fontSize: 16)),
                                         ),
                                       ),
                                     ],
@@ -737,7 +722,6 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                     setState(() {
                                       selectedRightIndex = index;
                                       selectedRightSubIndex = item.subitems.indexOf(sub);
-                                      // selectedLeftIndex = null;
                                     });
                                   },
                                   trailing: Row(

@@ -13,8 +13,8 @@ flutter pub get
 
 # 2. Run Builds
 Write-Host "---- Generate all icons (uncomment if new changes to master icon!) ----" -ForegroundColor Magenta
-dart --disable-analytics
-dart run flutter_launcher_icons
+# dart --disable-analytics
+# dart run flutter_launcher_icons
 
 Write-Host "---- Build web is disabled, not possible to store data files yet. ----" -ForegroundColor Magenta
 # Write-Host "Build Web (CanvasKit)..." -ForegroundColor Yellow

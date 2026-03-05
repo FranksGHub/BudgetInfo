@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get help => 'Help';
 
   @override
-  String get editTitle => 'Edit Title';
+  String get editTitle => 'App title';
 
   @override
   String get printPdf => 'Print list';
@@ -46,7 +46,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get time => 'Time';
 
   @override
-  String get editBudget => 'Edit Budget';
+  String get editBudget => 'Start budget for new entries';
 
   @override
   String get editBudgetHint => 'e.g. 120.50 or 120,50 (no thousands separator)';
@@ -55,13 +55,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editWorkplanFilename => 'List filename';
 
   @override
-  String get editSuggestionsFilename => 'Templates filename';
+  String get editSuggestionsFilename => 'Template list filename';
 
   @override
   String get workplanFilename => 'List filename';
 
   @override
-  String get suggestionsFilename => 'Templates filename';
+  String get suggestionsFilename => 'Template list filename';
 
   @override
   String get showOpenOnly => 'Do not show finished mainlines';
