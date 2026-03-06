@@ -3,9 +3,11 @@ import 'package:path/path.dart' as p;
 import 'dart:convert';
 import 'dart:io';
 import '../l10n/app_localizations.dart';
+import '../models/booking_item.dart';
 import '../models/budget_settings.dart';
 import '../models/export_import_files.dart';
-import '../models/block_item.dart';
+import '../models/year_item.dart';
+import '../models/month_item.dart';
 import '../models/filename_helper.dart';
 import '../models/print.dart';
 import 'edit_settings_dialog.dart';
@@ -24,8 +26,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
   BudgetSettings budgetSettings = new BudgetSettings();
   String dataPath = '';
 
-  List<BlockItem> leftItems = <BlockItem>[];
-  List<BlockItem> rightItems = <BlockItem>[];
+  List<YearItem> leftItems = <YearItem>[];
+  List<YearItem> rightItems = <YearItem>[];
   List<bool> leftExpanded = <bool>[];
   List<bool> rightExpanded = <bool>[];
   int? selectedLeftIndex;
@@ -99,8 +101,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
         String json = File(filePath).readAsStringSync();
         List<dynamic> data = jsonDecode(json);
         setState(() {
-          rightItems = List<BlockItem>.from(
-            data.map((e) => BlockItem.fromJson(e))
+          rightItems = List<YearItem>.from(
+            data.map((e) => YearItem.fromJson(e))
           );
           rightExpanded = rightItems.map((_) => false).toList();
         });
@@ -120,8 +122,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
         String json = File(filePath).readAsStringSync();
         List<dynamic> data = jsonDecode(json);
         setState(() {
-          leftItems = List<BlockItem>.from(
-            data.map((e) => BlockItem.fromJson(e))
+          leftItems = List<YearItem>.from(
+            data.map((e) => YearItem.fromJson(e))
           );
           leftExpanded = leftItems.map((item) => !item.subitems.every((s) => s.status == '(F)')).toList();
         });
@@ -383,19 +385,20 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     onPressed: () {
                       final newItemText = AppLocalizations.of(context)!.newItem;
                       setState(() {
-                        leftItems.add(BlockItem(text: newItemText, startBudget: 0));
+                        leftItems.add(YearItem(text: newItemText));
                         leftExpanded.add(true);
                       });
                       _saveLeftData();
                     },
                     child: Text(AppLocalizations.of(context)!.addItemLeft),
                   ),
+
                 if(!budgetSettings.hideLeftList)
                   ElevatedButton(
                     onPressed: selectedLeftIndex != null ? () {
                       final newSubitemText = AppLocalizations.of(context)!.newSubitem;
                       setState(() {
-                        leftItems[selectedLeftIndex!].subitems.add(BlockItem(text: newSubitemText, startBudget: budgetSettings.defaultBudget, resultBudget: budgetSettings.defaultBudget));
+                        leftItems[selectedLeftIndex!].subitems.add(MonthItem(text: newSubitemText, startBudget: budgetSettings.defaultBudget));
                       });
                       _saveLeftData();
                     } : null,
@@ -409,7 +412,14 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                   ElevatedButton(
                     onPressed: selectedRightIndex != null ? () {
                       var item = rightItems[selectedRightIndex!];
-                      var newItem = BlockItem(text: item.text, startBudget: 0, subitems: item.subitems.map((s) => BlockItem(text: s.text, startBudget: budgetSettings.defaultBudget)).toList(), status: '(P)');
+                      var newItem = YearItem(
+                        text: item.text, 
+                        subitems: item.subitems.map((s) => MonthItem(
+                          text: s.text, 
+                          startBudget: budgetSettings.defaultBudget, 
+                          subitems: s.subitems.map((ss) => BookingItem(text: ss.text, value: ss.value)).toList()
+                        )).toList()
+                      );
                       setState(() {
                         leftItems.add(newItem);
                         leftExpanded.add(true);
@@ -418,17 +428,23 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     } : null,
                     child: Text(AppLocalizations.of(context)!.copyItemToLeft),
                   ),
+
                 if(!budgetSettings.hideRightList && !budgetSettings.hideLeftList)
                   ElevatedButton(
                     onPressed: selectedRightIndex != null && selectedRightSubIndex != null && selectedLeftIndex != null ? () {
-                      final sub = rightItems[selectedRightIndex!].subitems[selectedRightSubIndex!];
+                      final s = rightItems[selectedRightIndex!].subitems[selectedRightSubIndex!];
                         setState(() {
-                          leftItems[selectedLeftIndex!].subitems.add(BlockItem(text: sub.text, startBudget: budgetSettings.defaultBudget, resultBudget: budgetSettings.defaultBudget));
+                          leftItems[selectedLeftIndex!].subitems.add(MonthItem(
+                            text: s.text, 
+                            startBudget: budgetSettings.defaultBudget, 
+                            subitems: s.subitems.map((ss) => BookingItem(text: ss.text, value: ss.value)).toList()
+                          ));
                         });
                         _saveLeftData();
                       } : null,
                     child: Text(AppLocalizations.of(context)!.copySubitemToLeft),
                   ),
+                
                 if(!budgetSettings.hideRightList)
                   const Spacer(),
 
@@ -438,19 +454,20 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     onPressed: () {
                       final newItemText = AppLocalizations.of(context)!.newItem;
                       setState(() {
-                        rightItems.add(BlockItem(text: newItemText, startBudget: 0));
+                        rightItems.add(YearItem(text: newItemText));
                         rightExpanded.add(true);
                       });
                       _saveRightData();
                     },
                     child: Text(AppLocalizations.of(context)!.addItemRight),
                   ),
+
                 if(!budgetSettings.hideRightList)
                   ElevatedButton(
                     onPressed: selectedRightIndex != null ? () {
                       final newSubitemText = AppLocalizations.of(context)!.newSubitem;
                       setState(() {
-                        rightItems[selectedRightIndex!].subitems.add(BlockItem(text: newSubitemText, startBudget: 0));
+                        rightItems[selectedRightIndex!].subitems.add(MonthItem(text: newSubitemText, startBudget: 0));
                       });
                       _saveRightData();
                     } : null,
@@ -476,8 +493,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                               var item = leftItems[index];
                               return ExpansionTile(
                                 initiallyExpanded: leftExpanded[index],
-                                backgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 136, 134, 121) : null,
-                                collapsedBackgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 136, 134, 121) : null,
+                                backgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 165, 164, 161) : null,
+                                collapsedBackgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 165, 164, 161) : null,
                                 tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                                 childrenPadding: EdgeInsets.zero,
                                 visualDensity: VisualDensity(vertical: -4),
@@ -491,9 +508,11 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                     setState(() => item.text = newText);
                                     _saveLeftData();
                                   }),
+
                                   child: Row(
                                     children: [
-                                      Expanded(child: Text(item.text, style: const TextStyle(height: 1.0, fontSize: 16, fontWeight: FontWeight.bold))),
+                                      Expanded(child: Text(item.getText(), style: const TextStyle(height: 1.0, fontSize: 16, fontWeight: FontWeight.bold))),
+                                      
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                                         onPressed: () {
@@ -538,6 +557,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                     ],
                                   ),
                                 ),
+
                                 children: item.subitems.map((sub) => ListTile(
                                   tileColor: null,  // selectedLeftIndex == index ? Color.fromARGB(255, 136, 134, 121) : null,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
@@ -556,7 +576,9 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       ),
                                       
                                       //Text(sub.status ?? '(P)', style: const TextStyle(height: 1.0, fontSize: 14)),
+
                                       const SizedBox(width: 8, height: 8),
+
                                       Expanded(
                                         child: GestureDetector(
                                           onDoubleTap: () => _editText(sub.text, (newText) {
@@ -572,8 +594,6 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                   onTap: () {
                                     setState(() {
                                     selectedLeftIndex = index;
-                                    // selectedRightIndex = null;
-                                    // selectedRightSubIndex = null;
                                     });
                                   },
                                   trailing: Row(
@@ -663,6 +683,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                   child: Row(
                                     children: [
                                       Expanded(child: Text(item.text, style: const TextStyle(height: 1.0, fontSize: 16, fontWeight: FontWeight.bold))),
+                                      
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                                         onPressed: () {
@@ -707,6 +728,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                     ],
                                   ),
                                 ),
+                                
                                 children: item.subitems.map((sub) => ListTile(
                                   tileColor: selectedRightIndex == index && selectedRightSubIndex == item.subitems.indexOf(sub) ? Color.fromARGB(255, 136, 134, 121) : null,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 70, vertical: 0),

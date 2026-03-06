@@ -1,12 +1,12 @@
-import 'package:budget_info/models/filename_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 import 'package:path/path.dart' as p;
 import '../l10n/app_localizations.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+import 'package:budget_info/models/filename_helper.dart';
 import 'budget_settings.dart';
-import 'block_item.dart';
+import '../models/year_item.dart';
 import '../models/export_import_files.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -24,12 +24,12 @@ class PrintPdf {
     String title = '${settings.titleLine}';
     // try to load list data
     String filePathName = await (settings.workplanFilename.length == 0 ? getFilePath(FilenameHelper.getDefaultLeftFilename(true)) : getFilePath(settings.workplanFilename)) + '.json';
-    List<BlockItem> leftItems = <BlockItem>[];
+    List<YearItem> leftItems = <YearItem>[];
     try {
       if (File(filePathName).existsSync()) {
         String json = File(filePathName).readAsStringSync();
         List<dynamic> data = jsonDecode(json);
-        leftItems = List<BlockItem>.from(data.map((e) => BlockItem.fromJson(e)));
+        leftItems = List<YearItem>.from(data.map((e) => YearItem.fromJson(e)));
       }
     } catch (e) {
       return false;
