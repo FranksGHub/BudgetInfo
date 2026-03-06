@@ -268,7 +268,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar( backgroundColor: const Color.fromARGB(255, 119, 202, 126),
         title: Text(budgetSettings.titleLine)
       ),
       endDrawer: Drawer(
@@ -493,8 +493,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                               var item = leftItems[index];
                               return ExpansionTile(
                                 initiallyExpanded: leftExpanded[index],
-                                backgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 165, 164, 161) : null,
-                                collapsedBackgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 165, 164, 161) : null,
+                                backgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 218, 218, 218) : null,
+                                collapsedBackgroundColor: selectedLeftIndex == index ? const Color.fromARGB(255, 218, 218, 218) : null,
                                 tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                                 childrenPadding: EdgeInsets.zero,
                                 visualDensity: VisualDensity(vertical: -4),
@@ -559,7 +559,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                 ),
 
                                 children: item.subitems.map((sub) => ListTile(
-                                  tileColor: null,  // selectedLeftIndex == index ? Color.fromARGB(255, 136, 134, 121) : null,
+                                  tileColor: null,  // selectedLeftIndex == index ? Color.fromARGB(255, 218, 218, 218) : null,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
                                   visualDensity: VisualDensity(vertical: -4),
                                   title: Row(
@@ -663,8 +663,8 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                               var item = rightItems[index];
                               return ExpansionTile(
                                 initiallyExpanded: rightExpanded[index],
-                                backgroundColor: selectedRightIndex == index ? const Color.fromARGB(255, 136, 134, 121) : null,
-                                collapsedBackgroundColor: selectedRightIndex == index ? const Color.fromARGB(255, 136, 134, 121) : null,
+                                backgroundColor: selectedRightIndex == index ? const Color.fromARGB(255, 218, 218, 218) : null,
+                                collapsedBackgroundColor: selectedRightIndex == index ? const Color.fromARGB(255, 218, 218, 218) : null,
                                 tilePadding: const EdgeInsets.symmetric(horizontal: 50, vertical: 0),
                                 childrenPadding: EdgeInsets.zero,
                                 visualDensity: VisualDensity(vertical: -4),
@@ -730,7 +730,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                 ),
                                 
                                 children: item.subitems.map((sub) => ListTile(
-                                  tileColor: selectedRightIndex == index && selectedRightSubIndex == item.subitems.indexOf(sub) ? Color.fromARGB(255, 136, 134, 121) : null,
+                                  tileColor: selectedRightIndex == index && selectedRightSubIndex == item.subitems.indexOf(sub) ? Color.fromARGB(255, 218, 218, 218) : null,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 70, vertical: 0),
                                   visualDensity: VisualDensity(vertical: -4),
                                   title: GestureDetector(
