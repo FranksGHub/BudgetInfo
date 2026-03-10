@@ -109,7 +109,7 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
             ),
           ),
 
-          // List area: Expanded sorgt für begrenzte Höhe
+          // Liste ohne Subitems, jede Zeile ist eine ListTile mit zwei Buttons
           Expanded(
             child: ListView.builder(
               itemCount: widget.monthItem.subitems.length,
@@ -119,33 +119,28 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
 
                 return Container(
                   color: isSelected ? const Color.fromARGB(255, 218, 218, 218) : null,
-                  child: ExpansionTile(
-                    initiallyExpanded: false,
-                    tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                    childrenPadding: EdgeInsets.zero,
-                    visualDensity: VisualDensity(vertical: -4),
-                    title: Row(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    title: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex = index;
+                        });
+                      },
+                      onDoubleTap: () => _editItem(item, (newItem) {
+                        setState(() {
+                          item.text = newItem.text;
+                          item.value = newItem.value;
+                        });
+                      }),
+                      child: Text(
+                        item.getText(),
+                        style: const TextStyle(height: 1.0, fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedIndex = index;
-                              });
-                            },
-                            onDoubleTap: () => _editItem(item, (newItem) {
-                              setState(() {
-                                item.text = newItem.text;
-                                item.value = newItem.value;
-                              });
-                            }),
-                            child: Text(
-                              item.getText(),
-                              style: const TextStyle(height: 1.0, fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-
                         IconButton(
                           icon: const Icon(Icons.edit, size: 20, color: Colors.green),
                           onPressed: () => _editItem(item, (newItem) {
@@ -155,7 +150,6 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
                             });
                           }),
                         ),
-
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                           onPressed: () {
@@ -171,13 +165,6 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
                         ),
                       ],
                     ),
-                    children: [
-                      // Beispiel-Inhalt der ExpansionTile
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text('Details zu ${item.text}'),
-                      ),
-                    ],
                   ),
                 );
               },
