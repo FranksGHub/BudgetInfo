@@ -112,6 +112,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editText => 'Edit Text';
 
   @override
+  String get editBooking => 'Edit Booking';
+
+  @override
+  String get editMonthName => 'Edit Name';
+
+  @override
   String get newBudgetItem => 'New Budget Item';
 
   @override

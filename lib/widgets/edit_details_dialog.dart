@@ -30,20 +30,14 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
     if (context.mounted) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red, duration: const Duration(seconds: 2)));}
   }
 
-  void _onSettingChanged() { 
-      setState(() {});
-      widget.onSave();
-  }
-
-
-  void _editItem(BookingItem item, Function(BookingItem) onSave) {
+  void _editItem(BookingItem item) {
     BookingItem newItem = new BookingItem(text: item.text, value: item.value);
     TextEditingController controllerText = TextEditingController(text: newItem.text);
     TextEditingController controllerValue = TextEditingController(text: newItem.value.toStringAsFixed(2));
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.editText),
+        title: Text(AppLocalizations.of(context)!.editBooking),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -60,12 +54,14 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
 
           TextButton(
             onPressed: () {
-              newItem.text = controllerText.text;
               final parsed = double.tryParse(controllerValue.text.replaceAll(",", "."));
               if (parsed == null) { _showError(AppLocalizations.of(context)!.noValidNumber); }
               else {
-                newItem.value = double.parse(controllerValue.text.replaceAll(",", "."));
-                onSave(newItem);
+                setState(() {
+                  item.value = double.parse(controllerValue.text.replaceAll(",", "."));
+                  item.text = controllerText.text;
+                 });
+                widget.onSave();
                 Navigator.pop(context);
               }
             },
@@ -76,6 +72,37 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
     );
   }
 
+  void _editText() {
+    TextEditingController controllerText = TextEditingController(text: widget.monthItem.text);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.editMonthName),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField( controller: controllerText, autofocus: true, ),
+          ]
+        ),
+        
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+
+          TextButton(
+            onPressed: () {
+              setState(() { widget.monthItem.text = controllerText.text; });
+                widget.onSave();
+                Navigator.pop(context);
+            },
+            child: Text(AppLocalizations.of(context)!.save),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,19 +118,27 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
-                ElevatedButton(
-                  onPressed: () { setState(() {}); _onSettingChanged(); },
-                  child: Text(AppLocalizations.of(context)!.saveBudgetButton),
-                ),
                 const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() { _editText(); });
+                    widget.onSave();
+                  },
+                  child: Text(AppLocalizations.of(context)!.editMonthName),
+                ),
+
+                const SizedBox(width: 12),
+
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
                       widget.monthItem.subitems.add(BookingItem(text: '?', value: 0));
                     });
+                    widget.onSave();
                   },
                   child: Text(AppLocalizations.of(context)!.newBudgetItem),
                 ),
+
                 const Spacer(),
               ],
             ),
@@ -122,17 +157,8 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     title: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                      },
-                      onDoubleTap: () => _editItem(item, (newItem) {
-                        setState(() {
-                          item.text = newItem.text;
-                          item.value = newItem.value;
-                        });
-                      }),
+                      onTap: () { setState(() { selectedIndex = index; });},
+                      onDoubleTap: () { _editItem(item); },
                       child: Text(
                         item.getText(),
                         style: const TextStyle(height: 1.0, fontSize: 16, fontWeight: FontWeight.bold),
@@ -143,13 +169,9 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit, size: 20, color: Colors.green),
-                          onPressed: () => _editItem(item, (newItem) {
-                            setState(() {
-                              item.text = newItem.text;
-                              item.value = newItem.value;
-                            });
-                          }),
+                          onPressed: () { _editItem(item); },
                         ),
+
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                           onPressed: () {
@@ -160,9 +182,11 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
                               } else if (selectedIndex != null && selectedIndex! > index) {
                                 selectedIndex = selectedIndex! - 1;
                               }
+                              widget.onSave();
                             });
                           },
                         ),
+                        
                       ],
                     ),
                   ),

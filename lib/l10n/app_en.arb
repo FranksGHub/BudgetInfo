@@ -32,6 +32,8 @@
   "saveTimetableData": "Save Budget Data",
   "saveTimetableDataSubject": "Budget Data Backup",
   "editText": "Edit Text",
+  "editBooking": "Edit Booking",
+  "editMonthName": "Edit Name",
   "newBudgetItem": "New Budget Item",
   "addItemLeft": "+ Mainline",
   "addSubitemLeft": "+ Subline",

@@ -113,6 +113,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get editText => 'Text bearbeiten';
 
   @override
+  String get editBooking => 'Buchung bearbeiten';
+
+  @override
+  String get editMonthName => 'Namen ändern';
+
+  @override
   String get newBudgetItem => 'Neues Budget Item';
 
   @override

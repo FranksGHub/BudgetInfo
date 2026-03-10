@@ -35,6 +35,8 @@
   "saveTimetableData": "Speichern der Budget Daten",
   "saveTimetableDataSubject": "Budget Daten Backup",
   "editText": "Text bearbeiten",
+  "editBooking": "Buchung bearbeiten",
+  "editMonthName": "Namen ändern",
   "newBudgetItem": "Neues Budget Item",
   "addItemLeft": "+ Kopfzeile",
   "addSubitemLeft": "+ Subzeile",

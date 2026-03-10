@@ -296,6 +296,18 @@ abstract class AppLocalizations {
   /// **'Edit Text'**
   String get editText;
 
+  /// No description provided for @editBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Booking'**
+  String get editBooking;
+
+  /// No description provided for @editMonthName.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Name'**
+  String get editMonthName;
+
   /// No description provided for @newBudgetItem.
   ///
   /// In en, this message translates to:

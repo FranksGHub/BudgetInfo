@@ -268,8 +268,10 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditDetailsDialog( monthItem: item,  onSave: () { _saveLeftData(); }
-        ),
+        builder: (context) => EditDetailsDialog( monthItem: item,  onSave: () { 
+          setState(() {});
+          _saveLeftData(); 
+        }),
       )
     );
   }
@@ -591,10 +593,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
 
                                       Expanded(
                                         child: GestureDetector(
-                                          onDoubleTap: () => _editText(sub.text, (newText) {
-                                            setState(() => sub.text = newText);
-                                            _saveLeftData();
-                                          }),
+                                          onDoubleTap: () { setState(() { _editDetails(sub); }); _saveLeftData(); },
                                           child: Text(sub.getText(), style: const TextStyle(height: 1.0, fontSize: 16)),
                                         ),
                                       ),
@@ -612,12 +611,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
 
                                       IconButton(
                                         icon: const Icon(Icons.edit, size: 20, color: Colors.green),
-                                        onPressed: () {
-                                          setState(() {
-                                            _editDetails(sub);
-                                          });
-                                          _saveLeftData();
-                                        },
+                                        onPressed: () { setState(() { _editDetails(sub); }); _saveLeftData(); },
                                       ),
 
                                       IconButton(
