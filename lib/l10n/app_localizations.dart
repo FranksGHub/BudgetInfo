@@ -296,6 +296,12 @@ abstract class AppLocalizations {
   /// **'Edit Text'**
   String get editText;
 
+  /// No description provided for @newBudgetItem.
+  ///
+  /// In en, this message translates to:
+  /// **'New Budget Item'**
+  String get newBudgetItem;
+
   /// No description provided for @addItemLeft.
   ///
   /// In en, this message translates to:
@@ -421,6 +427,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save'**
   String get saveNotesButton;
+
+  /// No description provided for @saveBudgetButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveBudgetButton;
 
   /// No description provided for @failedToCreateZipFile.
   ///

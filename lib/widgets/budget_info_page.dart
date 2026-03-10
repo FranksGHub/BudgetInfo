@@ -1,3 +1,4 @@
+import 'package:budget_info/widgets/edit_details_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'dart:convert';
@@ -117,7 +118,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
 
     // load the left list data from file
     try {
-      String filePath = (budgetSettings.workplanFilename.length == 0 ? getFilePath(FilenameHelper.getDefaultLeftFilename(true)) : getFilePath(budgetSettings.workplanFilename)) + '.json';
+      String filePath = budgetSettings.workplanFilename.length == 0 ? getFilePath(FilenameHelper.getDefaultLeftFilename(true)) : getFilePath(budgetSettings.workplanFilename + '.json');
       if (File(filePath).existsSync()) {
         String json = File(filePath).readAsStringSync();
         List<dynamic> data = jsonDecode(json);
@@ -168,7 +169,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
 
   void _saveLeftData() {
     try {
-      String filePath = (budgetSettings.workplanFilename.length == 0 ? getFilePath(FilenameHelper.getDefaultLeftFilename(true)) : getFilePath(budgetSettings.workplanFilename)) + '.json';
+      String filePath = budgetSettings.workplanFilename.length == 0 ? getFilePath(FilenameHelper.getDefaultLeftFilename(true)) : getFilePath(budgetSettings.workplanFilename + '.json');
       String json = jsonEncode(leftItems.map((e) => e.toJson()).toList());
       File(filePath).writeAsStringSync(json);
     } catch (e) {
@@ -231,12 +232,11 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
   }
 
   Future<void> _importData() async {
-    if(await ExportImportFiles().importAllFilesFromZip(context)) {
+    ReturnValue ret = await ExportImportFiles().importAllFilesFromZip(context);
+    if(ret == ReturnValue.Ok) {
       await _loadData(); // Reload data
       _showInfo(AppLocalizations.of(context)!.importbackupZipFileOk);
-    } else {
-      _showError(AppLocalizations.of(context)!.failedToImportZipFile);
-    }
+    } else if (ret == ReturnValue.Errors) { _showError(AppLocalizations.of(context)!.failedToImportZipFile); }
   }
 
   void _editSettings() {
@@ -262,6 +262,16 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
       setState(() {});
       _saveSettings();
     }
+  }
+
+  void _editDetails(MonthItem item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditDetailsDialog( monthItem: item,  onSave: () { _saveLeftData(); }
+        ),
+      )
+    );
   }
 
 
@@ -599,6 +609,17 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                   trailing: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
+
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, size: 20, color: Colors.green),
+                                        onPressed: () {
+                                          setState(() {
+                                            _editDetails(sub);
+                                          });
+                                          _saveLeftData();
+                                        },
+                                      ),
+
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: Colors.red),
                                         onPressed: () {
@@ -609,6 +630,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                           _saveLeftData();
                                         },
                                       ),
+
                                       IconButton(
                                         icon: const Icon(Icons.arrow_upward, size: 20),
                                         onPressed: () {

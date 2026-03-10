@@ -112,6 +112,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editText => 'Edit Text';
 
   @override
+  String get newBudgetItem => 'New Budget Item';
+
+  @override
   String get addItemLeft => '+ Mainline';
 
   @override
@@ -173,6 +176,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveNotesButton => 'Save';
+
+  @override
+  String get saveBudgetButton => 'Save';
 
   @override
   String get failedToCreateZipFile => 'Failed to create zip file';

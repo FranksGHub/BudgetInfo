@@ -11,6 +11,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/src/shared_preferences_legacy.dart';
 import '../l10n/app_localizations.dart';
 
+enum ReturnValue { Ok, Aborted, Errors }
+
 class ExportImportFiles {
   static String _prefsSettingsFilename = 'budget_info_settings.json';
   static String _prefsSettingsBackupFilename = 'budget_info_settings.json.bak';
@@ -180,24 +182,36 @@ class ExportImportFiles {
       // Share the zip file if running on android, or copy it at a user defined location on other platforms
       await saveOrShareFile(context, zipFile.path);
 
+      // delete the temporary file if still available
+      try { if (zipFile.existsSync()) { zipFile.delete(); }
+      } catch (e) { }
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.backupInZipFileOk), backgroundColor: Colors.green));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.failedToBackupInZipFile + ': $e'), backgroundColor: Colors.red) );
     }
   }
 
-  Future<bool> importAllFilesFromZip(BuildContext context) async {
+  Future<ReturnValue> importAllFilesFromZip(BuildContext context) async {
     try {
       final FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['zip']);
 
-      if (result == null) return false; // User canceled the picker
+      if (result == null) return ReturnValue.Aborted; // User canceled the picker
 
       final zipFilePath = result.files.single.path!;
       final zipFile = File(zipFilePath);
+      int filelength = await zipFile.length();
+      if(filelength > 1000000) {
+        return ReturnValue.Errors;
+      }
+
       final zipBytes = await zipFile.readAsBytes();
 
       // Decode the archive
       final archive = ZipDecoder().decodeBytes(zipBytes);
+      if(archive.isEmpty || archive.files.length == 0) {
+        return ReturnValue.Errors;
+      }
 
       // Get or create target directory
       final budgetInfoPath = await getPrivateDirectoryPath();
@@ -218,8 +232,8 @@ class ExportImportFiles {
       }
 
     } catch (e) {
-      return false;
+      return ReturnValue.Errors;
     }
-    return true;
+    return ReturnValue.Ok;
   }
 }
