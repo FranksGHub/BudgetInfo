@@ -198,17 +198,17 @@ class _EditSettingsDialogState extends State<EditSettingsDialog> {
 
             //const SizedBox(height: 8),
 
-            // Checkbox for notes setting
-            Row(
-              children: [
-                const SizedBox(width: 122),
-                Checkbox(
-                  value: showOpenOnly,
-                  onChanged: (value) { showOpenOnly = value ?? false; _onSettingChangedDirectly(); }
-                ),
-                Text(AppLocalizations.of(context)!.showOpenOnly),
-              ],
-            ),
+            // Checkbox row
+            //Row(
+            //  children: [
+            //    const SizedBox(width: 122),
+            //    Checkbox(
+            //      value: showOpenOnly,
+            //      onChanged: (value) { showOpenOnly = value ?? false; _onSettingChangedDirectly(); }
+            //    ),
+            //    Text(AppLocalizations.of(context)!.showOpenOnly),
+            //  ],
+            //),
 
           ],
         ),

@@ -214,26 +214,6 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
     );
   }
 
-  bool _askUser(String title) {
-    bool retValue = false;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog( title: Text(title),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          TextButton(
-            onPressed: () { retValue = true; Navigator.pop(context); },
-            child: Text(AppLocalizations.of(context)!.save),
-          ),
-        ],
-      ),
-    );
-    return retValue;
-  }
-
   void _switchListVisibility(bool leftList) {
     setState(() {
       if (leftList) { budgetSettings.hideLeftList = !budgetSettings.hideLeftList; } 
@@ -570,18 +550,16 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                                         onPressed: () {
-                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
-                                            setState(() {
-                                              leftItems.removeAt(index);
-                                              leftExpanded.removeAt(index);
-                                              if (selectedLeftIndex == index) {
-                                                selectedLeftIndex = null;
-                                              } else if (selectedLeftIndex != null && selectedLeftIndex! > index) {
-                                                selectedLeftIndex = selectedLeftIndex! - 1;
-                                              }
-                                            });
-                                            _saveLeftData();
-                                          }
+                                          setState(() {
+                                            leftItems.removeAt(index);
+                                            leftExpanded.removeAt(index);
+                                            if (selectedLeftIndex == index) {
+                                              selectedLeftIndex = null;
+                                            } else if (selectedLeftIndex != null && selectedLeftIndex! > index) {
+                                              selectedLeftIndex = selectedLeftIndex! - 1;
+                                            }
+                                          });
+                                          _saveLeftData();
                                         },
                                       ),
                                       IconButton(
@@ -665,18 +643,16 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: Colors.red),
                                         onPressed: () {
-                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
-                                            int subIndex = item.subitems.indexOf(sub);
-                                            setState(() {
-                                              item.subitems.removeAt(subIndex);
-                                              if (selectedLeftIndex == index) {
-                                                selectedLeftIndex = null;
-                                              } else if (selectedLeftIndex != null && selectedLeftIndex! > index) {
-                                                selectedLeftIndex = selectedLeftIndex! - 1;
-                                              }
-                                            });
-                                            _saveLeftData();
-                                          }
+                                          int subIndex = item.subitems.indexOf(sub);
+                                          setState(() {
+                                            item.subitems.removeAt(subIndex);
+                                            if (selectedLeftIndex == index) {
+                                              selectedLeftIndex = null;
+                                            } else if (selectedLeftIndex != null && selectedLeftIndex! > index) {
+                                              selectedLeftIndex = selectedLeftIndex! - 1;
+                                            }
+                                          });
+                                          _saveLeftData();
                                         },
                                       ),
 
@@ -758,19 +734,17 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                                         onPressed: () {
-                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
-                                            setState(() {
-                                              rightItems.removeAt(index);
-                                              rightExpanded.removeAt(index);
-                                              if (selectedRightIndex == index) {
-                                                selectedRightIndex = null;
-                                              } else if (selectedRightIndex != null && selectedRightIndex! > index) {
-                                                selectedRightIndex = selectedRightIndex! - 1;
-                                              }
-                                              selectedRightSubIndex = null;
-                                            });
-                                            _saveRightData();
-                                          }
+                                          setState(() {
+                                            rightItems.removeAt(index);
+                                            rightExpanded.removeAt(index);
+                                            if (selectedRightIndex == index) {
+                                              selectedRightIndex = null;
+                                            } else if (selectedRightIndex != null && selectedRightIndex! > index) {
+                                              selectedRightIndex = selectedRightIndex! - 1;
+                                            }
+                                            selectedRightSubIndex = null;
+                                          });
+                                          _saveRightData();
                                         },
                                       ),
                                       IconButton(
@@ -830,14 +804,12 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: Colors.red),
                                         onPressed: () {
-                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
-                                            int subIndex = item.subitems.indexOf(sub);
-                                            setState(() {
-                                              item.subitems.removeAt(subIndex);
-                                              selectedRightSubIndex = null;
-                                            });
-                                            _saveRightData();
-                                          }
+                                          int subIndex = item.subitems.indexOf(sub);
+                                          setState(() {
+                                            item.subitems.removeAt(subIndex);
+                                            selectedRightSubIndex = null;
+                                          });
+                                          _saveRightData();
                                         },
                                       ),
                                       IconButton(

@@ -133,26 +133,6 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
     );
   }
 
-  bool _askUser(String title) {
-    bool retValue = false;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog( title: Text(title),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          TextButton(
-            onPressed: () { retValue = true; Navigator.pop(context); },
-            child: Text(AppLocalizations.of(context)!.save),
-          ),
-        ],
-      ),
-    );
-    return retValue;
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -276,28 +256,19 @@ class _EditDetailsDialogState extends State<EditDetailsDialog> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
 
-                        IconButton(
-                          icon: const Icon(Icons.edit, size: 20, color: Colors.green),
-                          onPressed: () { _editItem(item); },
-                        ),
+                        IconButton( icon: const Icon(Icons.edit, size: 20, color: Colors.green), onPressed: () { _editItem(item); }, ),
 
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
-                          onPressed: () {
-                            if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
-                              setState(() {
-                                widget.monthItem.subitems.removeAt(index);
-                                if (selectedIndex == index) {
-                                  selectedIndex = null;
-                                } else if (selectedIndex != null && selectedIndex! > index) {
-                                  selectedIndex = selectedIndex! - 1;
-                                }
-                                widget.onSave();
-                              });
-                            }
-                          },
+                        IconButton( icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red), 
+                          onPressed: () { 
+                            setState(() {
+                              widget.monthItem.subitems.removeAt(index);
+                              if (selectedIndex == index) { selectedIndex = null;
+                              } else if (selectedIndex != null && selectedIndex! > index) { selectedIndex = selectedIndex! - 1; }
+                              widget.onSave();
+                            });
+                          }, 
                         ),
-
+                    
                         const SizedBox(width: 22),
                         
                       ],
