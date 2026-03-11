@@ -1,3 +1,4 @@
+import 'package:budget_info/models/month_item.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path/path.dart' as p;
@@ -19,11 +20,63 @@ class PrintPdf {
     return p.join(dataPath, ExportImportFiles.getSaveFilename(fileName));
   }
 
+  Future<bool> printBookings(BuildContext context, MonthItem month) async {
+    // Header title
+    String title = '${month.getText()}';
+
+    final pdf = pw.Document(title: AppLocalizations.of(context)!.appTitle, author: AppLocalizations.of(context)!.appNameWithSpaces, subject: title, keywords: 'budget, info, booking, print, pdf');
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.only(left: 60, right: 20, bottom: 20, top: 20),
+        build: (pw.Context ctx) {
+          return <pw.Widget>[
+
+            // Titel
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(bottom: 6),
+              child: pw.Text(title, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.black), textAlign: pw.TextAlign.left),
+            ),
+            pw.SizedBox(height: 12),
+
+            // Items
+            for (final item in month.subitems) ...[
+              // Item-Text (linksbündig, etwas Abstand nach unten)
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(bottom: 6),
+                child: pw.Text( item.getText(), style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold), textAlign: pw.TextAlign.left),
+              ),
+
+              // Abstand zwischen Items
+              pw.SizedBox(height: 8),
+            ],
+
+            // pw.Spacer(),
+            // // Footer / Print notice (optional)
+            pw.SizedBox(height: 12),  // Distance according to the table
+            pw.Container( alignment: pw.Alignment.centerRight, padding: const pw.EdgeInsets.only(right: 6),
+              child: pw.Text(AppLocalizations.of(context)!.printingFooter(DateTime.now().toLocal().toString().split('.').first), style: pw.TextStyle(fontSize: 10, color: PdfColors.grey))
+            )
+
+          ];
+        },
+      ),
+    );
+
+    try {
+      await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdf.save());
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> printBlockDetails(BuildContext context, BudgetSettings settings) async {
     // Header title
     String title = '${settings.titleLine}';
     // try to load list data
-    String filePathName = await (settings.workplanFilename.length == 0 ? getFilePath(FilenameHelper.getDefaultLeftFilename(true)) : getFilePath(settings.workplanFilename)) + '.json';
+    String filePathName = await (settings.workplanFilename.length == 0 ? getFilePath(FilenameHelper.getDefaultLeftFilename(true)) : getFilePath(settings.workplanFilename + '.json'));
     List<YearItem> leftItems = <YearItem>[];
     try {
       if (File(filePathName).existsSync()) {
@@ -36,19 +89,19 @@ class PrintPdf {
     }
     if (leftItems.isEmpty) return false;
 
-    final pdf = pw.Document(title: AppLocalizations.of(context)!.appTitle, author: AppLocalizations.of(context)!.appNameWithSpaces, subject: title, keywords: 'stundenplan, timetable, worklist, print, pdf');
+    final pdf = pw.Document(title: AppLocalizations.of(context)!.appTitle, author: AppLocalizations.of(context)!.appNameWithSpaces, subject: title, keywords: 'budget, info, booking, print, pdf');
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(18),
+        margin: const pw.EdgeInsets.only(left: 60, right: 20, bottom: 20, top: 20),
         build: (pw.Context ctx) {
           return <pw.Widget>[
 
             // Titel
             pw.Padding(
               padding: const pw.EdgeInsets.only(bottom: 6),
-              child: pw.Text(AppLocalizations.of(context)!.title + ':   ' + title, style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold, color: PdfColors.black), textAlign: pw.TextAlign.left),
+              child: pw.Text(title, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.black), textAlign: pw.TextAlign.left),
             ),
             pw.SizedBox(height: 12),
 
@@ -60,7 +113,7 @@ class PrintPdf {
                 child: pw.Text( item.text, style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold), textAlign: pw.TextAlign.left),
               ),
 
-              // Subitems: eingerückt, jede in einer Zeile mit Icon, Status-Text und Subitem-Text
+              // Subitems: eingerückt, jede in einer Zeile mit Icon, (Status-Text) und Subitem-Text
               for (final sub in item.subitems)
                 pw.Padding(
                   padding: const pw.EdgeInsets.only(left: 12, bottom: 4),
@@ -74,14 +127,14 @@ class PrintPdf {
                           shape: pw.BoxShape.circle,
                         ),
                       ),
-                      pw.SizedBox(width: 4),
-
+                      
+                      //pw.SizedBox(width: 4),
                       // Status Text
-                      pw.Text( sub.status ?? '', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal)),
+                      //pw.Text( sub.status ?? '', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal)),
                       pw.SizedBox(width: 8),
 
                       // Subitem Text (nimmt restlichen Platz)
-                      pw.Expanded(child: pw.Text( sub.text, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal)) ),
+                      pw.Expanded(child: pw.Text( sub.getText(), style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.normal)) ),
                     ],
                   ),
                 ),

@@ -46,6 +46,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get time => 'Zeit';
 
   @override
+  String get editFinishedAt => 'Endzeitpunkt ändern';
+
+  @override
+  String get editBudgetForMonth => 'Start Budget ändern';
+
+  @override
   String get editBudget => 'Start Budget für neue Einträge';
 
   @override
@@ -119,7 +125,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get editMonthName => 'Namen ändern';
 
   @override
-  String get newBudgetItem => 'Neues Budget Item';
+  String get newBudgetItem => '+ Buchung';
 
   @override
   String get addItemLeft => '+ Kopfzeile';
@@ -162,6 +168,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get newSubitem => '- Subzeile';
+
+  @override
+  String get realyDeleteItem => 'Diesen Eintrag wirklich löschen?';
 
   @override
   String get failedToLoadSettingsData =>

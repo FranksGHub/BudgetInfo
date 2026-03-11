@@ -46,6 +46,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get time => 'Time';
 
   @override
+  String get editFinishedAt => 'Change finished time';
+
+  @override
+  String get editBudgetForMonth => 'Change start budget';
+
+  @override
   String get editBudget => 'Start budget for new entries';
 
   @override
@@ -118,7 +124,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editMonthName => 'Edit Name';
 
   @override
-  String get newBudgetItem => 'New Budget Item';
+  String get newBudgetItem => '+ Booking item';
 
   @override
   String get addItemLeft => '+ Mainline';
@@ -161,6 +167,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newSubitem => '- New Subline';
+
+  @override
+  String get realyDeleteItem => 'Realy delete this item?';
 
   @override
   String get failedToLoadSettingsData => 'Failed to load settings data';

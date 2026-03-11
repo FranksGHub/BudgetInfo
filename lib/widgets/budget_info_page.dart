@@ -12,6 +12,8 @@ import '../models/month_item.dart';
 import '../models/filename_helper.dart';
 import '../models/print.dart';
 import 'edit_settings_dialog.dart';
+import 'help_page.dart';
+import 'version_menu.dart';
 
 class BudgetInfoPage extends StatefulWidget {
   const BudgetInfoPage({super.key, this.onLocaleChange, this.currentLocale});
@@ -212,6 +214,26 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
     );
   }
 
+  bool _askUser(String title) {
+    bool retValue = false;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog( title: Text(title),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () { retValue = true; Navigator.pop(context); },
+            child: Text(AppLocalizations.of(context)!.save),
+          ),
+        ],
+      ),
+    );
+    return retValue;
+  }
+
   void _switchListVisibility(bool leftList) {
     setState(() {
       if (leftList) { budgetSettings.hideLeftList = !budgetSettings.hideLeftList; } 
@@ -264,11 +286,11 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
     }
   }
 
-  void _editDetails(MonthItem item) {
+  void _editDetails(MonthItem item, String yearInfo) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditDetailsDialog( monthItem: item,  onSave: () { 
+        builder: (context) => EditDetailsDialog( monthItem: item, yearInfo: yearInfo, onSave: () { 
           setState(() {});
           _saveLeftData(); 
         }),
@@ -302,6 +324,22 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                 ),
               ),
             ),
+            
+            VersionMenu(),
+            ListTile(
+              leading: const Icon(Icons.help),
+              title: Text(AppLocalizations.of(context)!.help),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HelpPage()),
+                );
+              },
+            ),
+            
+            const Divider(),
+            
             ListTile(
               leading: budgetSettings.hideLeftList ? const Icon(Icons.switch_left) : const Icon(Icons.switch_right),
               title: Text((budgetSettings.hideLeftList ? AppLocalizations.of(context)!.show : AppLocalizations.of(context)!.hide) + ' ' + AppLocalizations.of(context)!.leftListShort),
@@ -383,13 +421,16 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
       
       body: Column(
         children: [
-            // Button row
+            
+            // Top button row
             Row(
               children: [
 
                 // Help Text, if booth lists are hidden
                 if( budgetSettings.hideRightList && budgetSettings.hideLeftList)
                   Text('     ' + AppLocalizations.of(context)!.bothListsHidden, style: TextStyle(color: Colors.red, fontSize: 20), textAlign: TextAlign.center),
+
+                const SizedBox(width: 12),
 
                 // Left list buttons Add Item, Add Subitem
                 if(!budgetSettings.hideLeftList)
@@ -416,6 +457,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                     } : null,
                     child: Text(AppLocalizations.of(context)!.addSubitemLeft),
                   ),
+
                 if(!budgetSettings.hideLeftList)
                   const Spacer(),
 
@@ -528,12 +570,18 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                                         onPressed: () {
-                                          setState(() {
-                                            leftItems.removeAt(index);
-                                            leftExpanded.removeAt(index);
-                                            if (selectedLeftIndex == index) selectedLeftIndex = null;
-                                          });
-                                          _saveLeftData();
+                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
+                                            setState(() {
+                                              leftItems.removeAt(index);
+                                              leftExpanded.removeAt(index);
+                                              if (selectedLeftIndex == index) {
+                                                selectedLeftIndex = null;
+                                              } else if (selectedLeftIndex != null && selectedLeftIndex! > index) {
+                                                selectedLeftIndex = selectedLeftIndex! - 1;
+                                              }
+                                            });
+                                            _saveLeftData();
+                                          }
                                         },
                                       ),
                                       IconButton(
@@ -593,7 +641,7 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
 
                                       Expanded(
                                         child: GestureDetector(
-                                          onDoubleTap: () { setState(() { _editDetails(sub); }); _saveLeftData(); },
+                                          onDoubleTap: () { setState(() { _editDetails(sub, item.getText()); }); _saveLeftData(); },
                                           child: Text(sub.getText(), style: const TextStyle(height: 1.0, fontSize: 16)),
                                         ),
                                       ),
@@ -611,17 +659,24 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
 
                                       IconButton(
                                         icon: const Icon(Icons.edit, size: 20, color: Colors.green),
-                                        onPressed: () { setState(() { _editDetails(sub); }); _saveLeftData(); },
+                                        onPressed: () { setState(() { _editDetails(sub, item.getText()); }); _saveLeftData(); },
                                       ),
 
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: Colors.red),
                                         onPressed: () {
-                                          int subIndex = item.subitems.indexOf(sub);
-                                          setState(() {
-                                            item.subitems.removeAt(subIndex);
-                                          });
-                                          _saveLeftData();
+                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
+                                            int subIndex = item.subitems.indexOf(sub);
+                                            setState(() {
+                                              item.subitems.removeAt(subIndex);
+                                              if (selectedLeftIndex == index) {
+                                                selectedLeftIndex = null;
+                                              } else if (selectedLeftIndex != null && selectedLeftIndex! > index) {
+                                                selectedLeftIndex = selectedLeftIndex! - 1;
+                                              }
+                                            });
+                                            _saveLeftData();
+                                          }
                                         },
                                       ),
 
@@ -703,12 +758,19 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 22, color: Colors.red),
                                         onPressed: () {
-                                          setState(() {
-                                            rightItems.removeAt(index);
-                                            rightExpanded.removeAt(index);
-                                            if (selectedRightIndex == index) selectedRightIndex = null;
-                                          });
-                                          _saveRightData();
+                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
+                                            setState(() {
+                                              rightItems.removeAt(index);
+                                              rightExpanded.removeAt(index);
+                                              if (selectedRightIndex == index) {
+                                                selectedRightIndex = null;
+                                              } else if (selectedRightIndex != null && selectedRightIndex! > index) {
+                                                selectedRightIndex = selectedRightIndex! - 1;
+                                              }
+                                              selectedRightSubIndex = null;
+                                            });
+                                            _saveRightData();
+                                          }
                                         },
                                       ),
                                       IconButton(
@@ -768,11 +830,14 @@ class _BudgetInfoPageState extends State<BudgetInfoPage> with WidgetsBindingObse
                                       IconButton(
                                         icon: const Icon(Icons.remove_circle_outline_rounded, size: 20, color: Colors.red),
                                         onPressed: () {
-                                          int subIndex = item.subitems.indexOf(sub);
-                                          setState(() {
-                                            item.subitems.removeAt(subIndex);
-                                          });
-                                          _saveRightData();
+                                          if(_askUser(AppLocalizations.of(context)!.realyDeleteItem)) {
+                                            int subIndex = item.subitems.indexOf(sub);
+                                            setState(() {
+                                              item.subitems.removeAt(subIndex);
+                                              selectedRightSubIndex = null;
+                                            });
+                                            _saveRightData();
+                                          }
                                         },
                                       ),
                                       IconButton(

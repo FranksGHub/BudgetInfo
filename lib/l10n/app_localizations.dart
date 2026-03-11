@@ -164,6 +164,18 @@ abstract class AppLocalizations {
   /// **'Time'**
   String get time;
 
+  /// No description provided for @editFinishedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Change finished time'**
+  String get editFinishedAt;
+
+  /// No description provided for @editBudgetForMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Change start budget'**
+  String get editBudgetForMonth;
+
   /// No description provided for @editBudget.
   ///
   /// In en, this message translates to:
@@ -311,7 +323,7 @@ abstract class AppLocalizations {
   /// No description provided for @newBudgetItem.
   ///
   /// In en, this message translates to:
-  /// **'New Budget Item'**
+  /// **'+ Booking item'**
   String get newBudgetItem;
 
   /// No description provided for @addItemLeft.
@@ -397,6 +409,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'- New Subline'**
   String get newSubitem;
+
+  /// No description provided for @realyDeleteItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Realy delete this item?'**
+  String get realyDeleteItem;
 
   /// No description provided for @failedToLoadSettingsData.
   ///
