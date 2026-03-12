@@ -13,3 +13,61 @@ All private elements starting with'_':  _lowerCamelCase _onChanged()
 
 Version 1.0.0
 copy code from teachers_timetable
+
+Android start problem:
+E/AndroidRuntime(26388): FATAL EXCEPTION: main
+E/AndroidRuntime(26388): Process: com.example.budget_info, PID: 26388
+E/AndroidRuntime(26388): java.lang.RuntimeException: Unable to instantiate activity ComponentInfo{com.example.budget_info/com.example.budget_info.MainActivity}: ...
+
+
+Android sucht beim Start die Datei:
+android/app/src/main/kotlin/com/example/budget_info/MainActivity.kt
+
+Falls noch vorhanden muss der Name übereinstimmen, kann aber auch fehlen
+android/app/src/main/AndroidManifest.xml
+package="com.example.budget_info"
+
+Ordnerstruktur im Android‑Projekt - prüfe, ob der Pfad wirklich existiert:
+android/app/src/main/kotlin/com/example/budget_info/MainActivity.kt
+
+Package‑Deklaration in MainActivity.kt:
+package com.example.budget_info
+Wenn dort etwas anderes steht → Crash.
+
+android/app/build.gradle
+defaultConfig { applicationId "com.example.budget_info" }
+Auch das muss exakt übereinstimmen.
+
+Bei mir fehlte der komplette Pfad unter: "android/app/src/main/kotlin/com/example"
+
+So reparierst du das Android‑Projekt:
+Benenne deinen aktuellen Android‑Ordner um in "android_old"
+Erzeuge einen neuen Ordner mit:
+flutter create .
+
+Projekt neu bauen:
+flutter clean
+flutter pub get
+flutter run
+
+
+Version 1.1.0
+Wie kann ich den Pfad "com.example", der ja wohl nur ein default ist, sauber auf meinen eigenen Pfad ändern, zum Beispiel "dieEichenApps"?
+
+android/app/build.gradle:
+defaultConfig { applicationId "dieEichenApps.budget_info" }
+namespace = "dieEichenApps.budget_info"
+
+Ordnerstruktur anpassen
+android/app/src/main/kotlin/com/example/budget_info/MainActivity.kt
+ändern in
+android/app/src/main/kotlin/dieEichenApps/budget_info/MainActivity.kt
+
+android\app\src\main\kotlin\dieEichenApps\budget_info\MainActivity.kt:
+package dieEichenApps.budget_info
+
+Projekt neu bauen:
+flutter clean
+flutter pub get
+flutter run
+

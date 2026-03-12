@@ -91,15 +91,6 @@ class _EditSettingsDialogState extends State<EditSettingsDialog> {
     });
   }
 
-  void _onSettingChangedDirectly() { 
-    bool changed = false;
-    if(widget.settings.showOpenOnly != showOpenOnly) { changed = true; internalSettings.showOpenOnly = showOpenOnly; }
-    if(changed) {
-      setState(() {});
-      widget.onSave(internalSettings);
-    }
-  }
-
   Widget _buildSettingRow({ required String label, required TextEditingController controller,}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),

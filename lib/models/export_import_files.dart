@@ -58,22 +58,26 @@ class ExportImportFiles {
   }
 
   Future<bool> saveOrShareFile(BuildContext context, String filename) async {
-    if (Platform.isAndroid) {
-      // Share on Android
-      await SharePlus.instance.share(ShareParams(files: [XFile(filename)], subject: AppLocalizations.of(context)!.saveTimetableDataSubject, title: AppLocalizations.of(context)!.saveTimetableData));
-      return true;
-    }
+    try { 
+      if (Platform.isAndroid) {
+        // Share on Android
+        await SharePlus.instance.share(ShareParams(files: [XFile(filename)], subject: AppLocalizations.of(context)!.saveTimetableDataSubject, title: AppLocalizations.of(context)!.saveTimetableData));
+        return true;
+      }
 
-    // Save to file on Windows/Web
-    String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: AppLocalizations.of(context)!.saveTimetableData,
-      fileName: p.basename(filename),
-      type: FileType.custom,
-      allowedExtensions: [p.extension(filename)],
-    );
+      // Save to file on Windows/Web
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: AppLocalizations.of(context)!.saveTimetableData,
+        fileName: p.basename(filename),
+        type: FileType.custom, 
+        allowedExtensions: ['zip']
+      );
 
-    if (outputFile != null && await copyFile(context, filename, outputFile)) {
-      return true;
+      if (outputFile != null && await copyFile(context, filename, outputFile)) {
+        return true;
+      }
+    } catch (e) { 
+      // Fehlerbehandlung (z. B. Berechtigungen, Datei in Benutzung) 
     }
     return false;
   }
@@ -180,13 +184,14 @@ class ExportImportFiles {
       await zipFile.writeAsBytes(zipData);
 
       // Share the zip file if running on android, or copy it at a user defined location on other platforms
-      await saveOrShareFile(context, zipFile.path);
+      if(await saveOrShareFile(context, zipFile.path)) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.backupInZipFileOk), backgroundColor: Colors.green));
+      }
 
       // delete the temporary file if still available
       try { if (zipFile.existsSync()) { zipFile.delete(); }
       } catch (e) { }
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.backupInZipFileOk), backgroundColor: Colors.green));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.failedToBackupInZipFile + ': $e'), backgroundColor: Colors.red) );
     }
