@@ -66,7 +66,7 @@ class ExportImportFiles {
       }
 
       // Save to file on Windows/Web
-      String? outputFile = await FilePicker.platform.saveFile(
+      String? outputFile = await FilePicker.saveFile(
         dialogTitle: AppLocalizations.of(context)!.saveTimetableData,
         fileName: p.basename(filename),
         type: FileType.custom, 
@@ -199,7 +199,7 @@ class ExportImportFiles {
 
   Future<ReturnValue> importAllFilesFromZip(BuildContext context) async {
     try {
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['zip']);
+      final FilePickerResult? result = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['zip']);
 
       if (result == null) return ReturnValue.Aborted; // User canceled the picker
 
