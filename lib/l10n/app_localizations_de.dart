@@ -71,6 +71,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get suggestionsFilename => 'Dateiname der Template Liste';
 
   @override
+  String get myFilePickerTitleWorkPlan => 'Wähle eine Datei für die Liste';
+
+  @override
+  String get myFilePickerTitleSuggestions =>
+      'Wähle eine Datei für die Template Liste';
+
+  @override
+  String get noFilesFoundInAppDirTitle => 'Datei nicht gefunden';
+
+  @override
+  String get noFilesFoundInAppDir =>
+      'Keine Datein im APP Verzeichnis vorhanden!';
+
+  @override
   String get showOpenOnly => 'Verstecke abgeschlossene Kopfzeilen';
 
   @override
@@ -90,6 +104,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get cancel => 'Abbrechen';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get delete => 'Datei löschen';
 
   @override
   String get title => 'Titel';

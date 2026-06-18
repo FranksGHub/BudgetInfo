@@ -212,6 +212,30 @@ abstract class AppLocalizations {
   /// **'Template list filename'**
   String get suggestionsFilename;
 
+  /// No description provided for @myFilePickerTitleWorkPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a file for the list'**
+  String get myFilePickerTitleWorkPlan;
+
+  /// No description provided for @myFilePickerTitleSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a file for the template list'**
+  String get myFilePickerTitleSuggestions;
+
+  /// No description provided for @noFilesFoundInAppDirTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'File not found'**
+  String get noFilesFoundInAppDirTitle;
+
+  /// No description provided for @noFilesFoundInAppDir.
+  ///
+  /// In en, this message translates to:
+  /// **'No files found inside the APP path!'**
+  String get noFilesFoundInAppDir;
+
   /// No description provided for @showOpenOnly.
   ///
   /// In en, this message translates to:
@@ -253,6 +277,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete file'**
+  String get delete;
 
   /// No description provided for @title.
   ///
